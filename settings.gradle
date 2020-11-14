@@ -1,2 +1,3 @@
+include ':ImageSteganographyLibrary'
 include ':app'
 rootProject.name = "StegWare-App"
