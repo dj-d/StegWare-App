@@ -7,7 +7,7 @@ import java.util.List;
 
 public abstract class AbstractNode {
     protected AbstractNode parent;
-    protected List<AbstractNode> children;
+    public List<AbstractNode> children;
 
     public AbstractNode(AbstractNode parent) {
         this.parent = parent;
