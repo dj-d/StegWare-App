@@ -7,7 +7,7 @@ import com.example.stegware_app.compile_utility.nodes.abstracts.AbstractNode;
 public class ImportNode extends AbstractNode {
     public static final String IMPORT_KEY_WORD = "import ";
 
-    private String packagePath;
+    public String packagePath;
     private String packageName;
 
     public ImportNode(AbstractNode _parent, String _statement) {

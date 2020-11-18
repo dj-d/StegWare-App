@@ -9,6 +9,8 @@ import com.example.stegware_app.compile_utility.nodes.MethodNode;
 import com.example.stegware_app.compile_utility.nodes.StatementNode;
 import com.example.stegware_app.compile_utility.nodes.abstracts.AbstractNode;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 public class JavaParser {
@@ -184,5 +186,86 @@ public class JavaParser {
      */
     private void buildAST() throws InvalidSourceCodeException {
         this.parsedFile.root = parser(this.sourceCode, 0, this.sourceCode.length(), this.parsedFile.getRoot());
+    }
+
+    /**
+     *
+     *
+     * @return
+     */
+    public List<String> getImportPackagesPathList() {
+        List<String> importStatement = new ArrayList<>();
+
+        for (int i = 0; i < this.parsedFile.root.children.size(); i++) {
+            AbstractNode abstractNode = this.parsedFile.root.children.get(i);
+
+            if (abstractNode instanceof ImportNode) {
+                importStatement.add(((ImportNode) abstractNode).packagePath);
+            }
+        }
+
+        return importStatement;
+    }
+
+    /**
+     *
+     * @param root
+     * @return
+     */
+    public List<ClassNode> getParsedClassList(AbstractNode root) {
+        List<ClassNode> parsedClasses = new ArrayList<>();
+
+        for (int i = 0; i < root.children.size(); i++) {
+            AbstractNode abstractNode = root.children.get(i);
+
+            if (abstractNode instanceof ClassNode) {
+                parsedClasses.add((ClassNode) abstractNode);
+            }
+        }
+
+        return parsedClasses;
+    }
+
+    public List<ConstructorNode> getParsedConstructorList(ClassNode parsedClass) {
+        List<ConstructorNode> parsedConstructors = new ArrayList<>();
+
+        for (int i = 0; i < parsedClass.children.size(); i++) {
+            AbstractNode abstractNode = parsedClass.children.get(i);
+
+            if (abstractNode instanceof ConstructorNode) {
+                parsedConstructors.add((ConstructorNode) abstractNode);
+            }
+        }
+
+        return parsedConstructors;
+    }
+
+    /**
+     *
+     *
+     * @param parsedClass
+     * @return
+     */
+    public List<MethodNode> getParsedMethodList(ClassNode parsedClass) {
+        List<MethodNode> parsedMethods = new ArrayList<>();
+
+        for (int i = 0; i < parsedClass.children.size(); i++) {
+            AbstractNode abstractNode = parsedClass.children.get(i);
+
+            if (abstractNode instanceof MethodNode) {
+                parsedMethods.add((MethodNode) abstractNode);
+            }
+        }
+
+        return parsedMethods;
+    }
+
+    /**
+     *
+     *
+     * @return
+     */
+    public SyntaxTree getParsedFile() {
+        return parsedFile;
     }
 }

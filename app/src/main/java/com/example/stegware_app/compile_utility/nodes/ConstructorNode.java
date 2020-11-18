@@ -6,7 +6,7 @@ import com.example.stegware_app.compile_utility.nodes.abstracts.AbstractNode;
 
 public class ConstructorNode extends AbstractNode {
     private String signature;
-    private String body;
+    public String body;
 
     public ConstructorNode(AbstractNode _parent, String _signature, String _body) {
         super(_parent);
