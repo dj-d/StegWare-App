@@ -18,8 +18,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
         Button encode = findViewById(R.id.encode_button);
 
-        encode.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), Encode.class)));
+        encode.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), Decode.class)));
 
         Intent cacheService = new Intent(getApplicationContext(), CacheService.class);
         startService(cacheService);
@@ -40,23 +38,16 @@ public class MainActivity extends AppCompatActivity {
         int ReadPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
         List<String> listPermissionsNeeded = new ArrayList<>();
 
-        Log.d(CacheService.TAG, "1");
-
         if (ReadPermission != PackageManager.PERMISSION_GRANTED) {
-            Log.d(CacheService.TAG, "2");
             listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
 
         if (permissionWriteStorage != PackageManager.PERMISSION_GRANTED) {
-            Log.d(CacheService.TAG, "3");
             listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
 
         if (!listPermissionsNeeded.isEmpty()) {
-            Log.d(CacheService.TAG, "4");
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), 1);
         }
-
-        Log.d(CacheService.TAG, "5");
     }
 }
