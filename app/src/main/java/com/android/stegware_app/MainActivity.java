@@ -27,10 +27,14 @@ public class MainActivity extends AppCompatActivity {
 
         Button encode = findViewById(R.id.encode_button);
 
-        encode.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), Decode.class)));
+        encode.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), Encode.class)));
 
-        Intent cacheService = new Intent(getApplicationContext(), CacheService.class);
-        startService(cacheService);
+        Button decode = findViewById(R.id.decode_button);
+
+        decode.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), Decode.class)));
+
+//        Intent cacheService = new Intent(getApplicationContext(), CacheService.class);
+//        startService(cacheService);
     }
 
     private void checkAndRequestPermissions() {
