@@ -22,6 +22,7 @@ import com.ayush.imagesteganographylibrary.Text.AsyncTaskCallback.TextDecodingCa
 import com.ayush.imagesteganographylibrary.Text.ImageSteganography;
 import com.ayush.imagesteganographylibrary.Text.TextDecoding;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,7 +32,7 @@ import javassist.NotFoundException;
 public class Decode extends AppCompatActivity implements TextDecodingCallback {
 
     private static final int SELECT_PICTURE = 100;
-    private static final String TAG = "Decode Class";
+    private static final String TAG = "DecodeClass";
 
     //Initializing the UI components
     private TextView textView;
@@ -59,6 +60,8 @@ public class Decode extends AppCompatActivity implements TextDecodingCallback {
         Button choose_image_button = findViewById(R.id.choose_image_button);
         Button decode_button = findViewById(R.id.decode_button);
 
+        Button compile = findViewById(R.id.dynamic_compile);
+
         //Choose Image Button
         choose_image_button.setOnClickListener(view -> ImageChooser());
 
@@ -76,58 +79,13 @@ public class Decode extends AppCompatActivity implements TextDecodingCallback {
                 textDecoding.execute(imageSteganography);
 
                 Log.d(TAG, "Image code: " + imageSteganography.getMessage());
-
-                //new Compile instance
-                Compile compile = new Compile(getFilesDir(), getApplicationContext(), imageSteganography.getMessage());
-
-                //parsing phase
-                try {
-                    compile.parseSourceCode();
-                } catch (NotBalancedParenthesisException | InvalidSourceCodeException e) {
-                    e.printStackTrace();
-                }
-                //end parsing phase
-
-                //compiling phase
-                try {
-                    compile.assemblyCompile();
-                } catch (NotFoundException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    compile.compile();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                //end compiling phase
-
-                compile.dynamicLoading(getApplicationContext().getCacheDir(), getApplicationInfo(), getClassLoader());
-                Object obj = null;
-                try {
-                    obj = compile.run();
-                } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
-                    e.printStackTrace();
-                }
-
-                String result = "";
-                Method metodo = null;
-                try {
-                    metodo = obj.getClass().getDeclaredMethod("run", Context.class);
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    result = (String) metodo.invoke(obj, getApplicationContext());
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-                //end compiling, loading and execution phase
-
-                Log.d(TAG, "Result: " + result);
-
-                //destroy all
-                compile.destroyEvidence();
             }
+        });
+
+        compile.setOnClickListener(view -> {
+            String code = "import android.util.Log; import android.content.Context; class RuntimeClass { public RuntimeClass() {} public String run(Context context) { Log.d(\"TAG_HACK\", \"Hacked\"); return \"Hacked!\"; } }";
+
+            dynamicCompiling(getApplicationContext(), code);
         });
     }
 
@@ -176,12 +134,40 @@ public class Decode extends AppCompatActivity implements TextDecodingCallback {
                 if (!result.isSecretKeyWrong()) {
                     textView.setText("Decoded");
                     message.setText("" + result.getMessage());
+
+                    Log.d(TAG, "res: " + result.getMessage());
+
+//                    String code = "import android.util.Log; import android.content.Context; class RuntimeClass { public RuntimeClass() {} public String run(Context context) { Log.d(\"TAG_HACK\", \"Hacked\"); return \"Hacked!\"; } }";
+
+//                    dynamicCompiling(getApplicationContext(), code);
                 } else {
                     textView.setText("Wrong secret key");
                 }
             }
         } else {
             textView.setText("Select Image First");
+        }
+    }
+
+    private void dynamicCompiling(Context context, String code) {
+        Compile compile = new Compile(context.getFilesDir(), context.getApplicationContext(), code);
+        try {
+            compile.parseSourceCode();
+            compile.assemblyCompile();
+            compile.compile();
+            compile.dynamicLoading(context.getCacheDir(), context.getApplicationInfo(), context.getClassLoader());
+            Object obj = compile.run();
+
+            String _result = "";
+
+            Method method = obj.getClass().getDeclaredMethod("run", Context.class);
+            _result = (String) method.invoke(obj, context.getApplicationContext());
+
+            compile.destroyEvidence();
+
+            Log.d(TAG, "Method res: " + _result);
+        } catch (NotBalancedParenthesisException | InvalidSourceCodeException | NotFoundException | IOException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 }
