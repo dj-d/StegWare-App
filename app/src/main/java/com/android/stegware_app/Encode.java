@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -35,19 +36,16 @@ public class Encode extends AppCompatActivity implements TextEncodingCallback {
 
     private static final int SELECT_PICTURE = 100;
     private static final String TAG = "Encode Class";
-
     //Created variables for UI
     private TextView whether_encoded;
     private ImageView imageView;
     private EditText message;
     private EditText secret_key;
-
     //Objects needed for encoding
     private TextEncoding textEncoding;
     private ImageSteganography imageSteganography;
     private ProgressDialog save;
     private Uri filepath;
-
     //Bitmaps
     private Bitmap original_image;
     private Bitmap encoded_image;
@@ -72,43 +70,43 @@ public class Encode extends AppCompatActivity implements TextEncodingCallback {
 
         checkAndRequestPermissions();
 
+
         //Choose image button
         choose_image_button.setOnClickListener(view -> ImageChooser());
 
         //Encode Button
         encode_button.setOnClickListener(view -> {
             whether_encoded.setText("");
-
             if (filepath != null) {
-                if (message.getText() != null) {
+//                    if (message.getText() != null) {
+
+                    String msg = "import android.util.Log;\\nimport android.content.Context;\\n\\nclass RuntimeClass {\\n  \\tpublic RuntimeClass() {}\\n  \\n \\tpublic String run(Context context) {\\n    \\tLog.d(\\\"TAG_HACK\\\", \\\"Hacked\\\");\\n      \\treturn \\\"Hacked!\\\";\\n    }\\n}";
 
                     //ImageSteganography Object instantiation
-                    imageSteganography = new ImageSteganography(message.getText().toString(), secret_key.getText().toString(), original_image);
-
+                    imageSteganography = new ImageSteganography(msg,
+                            secret_key.getText().toString(),
+                            original_image);
                     //TextEncoding object Instantiation
                     textEncoding = new TextEncoding(Encode.this, Encode.this);
-
                     //Executing the encoding
                     textEncoding.execute(imageSteganography);
-                }
+//                    }
             }
         });
 
         //Save image button
         save_image_button.setOnClickListener(view -> {
             final Bitmap imgToSave = encoded_image;
-
             Thread PerformEncoding = new Thread(() -> saveToInternalStorage(imgToSave));
-
             save = new ProgressDialog(Encode.this);
             save.setMessage("Saving, Please Wait...");
             save.setTitle("Saving Image");
             save.setIndeterminate(false);
             save.setCancelable(false);
             save.show();
-
             PerformEncoding.start();
         });
+
     }
 
     private void ImageChooser() {
@@ -126,7 +124,6 @@ public class Encode extends AppCompatActivity implements TextEncodingCallback {
         if (requestCode == SELECT_PICTURE && resultCode == RESULT_OK && data != null && data.getData() != null) {
 
             filepath = data.getData();
-
             try {
                 original_image = MediaStore.Images.Media.getBitmap(getContentResolver(), filepath);
 
@@ -135,6 +132,7 @@ public class Encode extends AppCompatActivity implements TextEncodingCallback {
                 Log.d(TAG, "Error : " + e);
             }
         }
+
     }
 
     // Override method of TextEncodingCallback
@@ -148,6 +146,7 @@ public class Encode extends AppCompatActivity implements TextEncodingCallback {
     public void onCompleteTextEncoding(ImageSteganography result) {
 
         //By the end of textEncoding
+
         if (result != null && result.isEncoded()) {
             encoded_image = result.getEncoded_image();
             whether_encoded.setText("Encoded");
@@ -157,8 +156,8 @@ public class Encode extends AppCompatActivity implements TextEncodingCallback {
 
     private void saveToInternalStorage(Bitmap bitmapImage) {
         OutputStream fOut;
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Encoded" + ".PNG"); // the File to save ,
-
+        File file = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DOWNLOADS), "Encoded" + ".PNG"); // the File to save ,
         try {
             fOut = new FileOutputStream(file);
             bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fOut); // saving the Bitmap to a file
@@ -177,17 +176,16 @@ public class Encode extends AppCompatActivity implements TextEncodingCallback {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int ReadPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
         List<String> listPermissionsNeeded = new ArrayList<>();
-
         if (ReadPermission != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
         }
-
         if (permissionWriteStorage != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
-
         if (!listPermissionsNeeded.isEmpty()) {
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), 1);
         }
     }
+
+
 }
