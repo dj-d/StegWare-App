@@ -28,17 +28,17 @@ import javassist.android.DexFile;
 import javassist.android.Log;
 
 public class Compile {
-    private File dir;
-    private Context context;
+    private final File dir;
+    private final Context context;
 
-    private String sourceCode;
+    private final String sourceCode;
 
 
-    private List<String> classesName;
-    private List<File> dexFiles;
-    private List<File> classFiles;
+    private final List<String> classesName;
+    private final List<File> dexFiles;
+    private final List<File> classFiles;
 
-    private List<DexClassLoader> dexClassLoaders;
+    private final List<DexClassLoader> dexClassLoaders;
 
 
     private JavaParser javaParser;
@@ -78,7 +78,7 @@ public class Compile {
         //end import phase
 
 
-        List<ClassNode> parsedClasses = this.javaParser.getParsedClassList(this.javaParser.getParserdFile().getRoot());
+        List<ClassNode> parsedClasses = this.javaParser.getParsedClassList(this.javaParser.getParsedFile().getRoot());
         for (int i = 0; i < parsedClasses.size(); i++) {
             ClassNode parsedClass = parsedClasses.get(i);
             Log.e("Compiling Class: " + parsedClass.toString());
@@ -156,7 +156,7 @@ public class Compile {
 
 
     public Object run() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
-        for (int i = 0; i < this.dexClassLoaders.size(); i++) {
+        for (int i = 0; i < this.dexClassLoaders.size(); ++i) {
             Class loadedClass = this.dexClassLoaders.get(i).loadClass(this.classesName.get(i));
             Constructor constructor = loadedClass.getConstructor();
             return constructor.newInstance();

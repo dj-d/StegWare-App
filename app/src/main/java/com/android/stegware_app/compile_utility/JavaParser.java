@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Stack;
 
 public class JavaParser {
-    private String sourceCode;
+    private final String sourceCode;
 
-    private SyntaxTree parserdFile;
+    private final SyntaxTree parsedFile;
 
     public JavaParser(String pSourceCode) throws NotBalancedParenthesisException, InvalidSourceCodeException {
         if(!JavaParser.areParanthesisBalanced(pSourceCode)) {
@@ -25,13 +25,13 @@ public class JavaParser {
 
         this.sourceCode = pSourceCode;
 
-        this.parserdFile = new SyntaxTree();
+        this.parsedFile = new SyntaxTree();
 
         this.buildAST();
     }
 
     public void buildAST() throws InvalidSourceCodeException{
-        this.parserdFile.root = parser(this.sourceCode, 0, this.sourceCode.length(), this.parserdFile.getRoot());
+        this.parsedFile.root = parser(this.sourceCode, 0, this.sourceCode.length(), this.parsedFile.getRoot());
     }
 
     /**
@@ -119,8 +119,8 @@ public class JavaParser {
     public List<String> getImportPackagesPathList() {
         List<String> importStatement = new ArrayList<>();
 
-        for (int i = 0; i < this.parserdFile.root.children.size(); i++) {
-            AbstractNode abstractNode = this.parserdFile.root.children.get(i);
+        for (int i = 0; i < this.parsedFile.root.children.size(); i++) {
+            AbstractNode abstractNode = this.parsedFile.root.children.get(i);
             if(abstractNode instanceof ImportNode) {
                 importStatement.add(((ImportNode) abstractNode).packagePath);
             }
@@ -165,8 +165,8 @@ public class JavaParser {
         return parsedMethods;
     }
 
-    public SyntaxTree getParserdFile() {
-        return parserdFile;
+    public SyntaxTree getParsedFile() {
+        return parsedFile;
     }
 
     private static int findEndOfBlock(String code, int start) {

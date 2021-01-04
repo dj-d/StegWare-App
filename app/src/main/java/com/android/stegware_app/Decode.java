@@ -139,7 +139,7 @@ public class Decode extends AppCompatActivity implements TextDecodingCallback {
 
 //                    String code = "import android.util.Log; import android.content.Context; class RuntimeClass { public RuntimeClass() {} public String run(Context context) { Log.d(\"TAG_HACK\", \"Hacked\"); return \"Hacked!\"; } }";
 
-//                    dynamicCompiling(getApplicationContext(), code);
+                    dynamicCompiling(getApplicationContext(), result.getMessage());
                 } else {
                     textView.setText("Wrong secret key");
                 }
