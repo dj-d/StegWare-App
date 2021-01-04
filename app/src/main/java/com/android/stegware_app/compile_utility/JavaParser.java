@@ -19,7 +19,7 @@ public class JavaParser {
     private final SyntaxTree parsedFile;
 
     public JavaParser(String pSourceCode) throws NotBalancedParenthesisException, InvalidSourceCodeException {
-        if(!JavaParser.areParanthesisBalanced(pSourceCode)) {
+        if(!JavaParser.areParenthesisBalanced(pSourceCode)) {
             throw new NotBalancedParenthesisException();
         }
 
@@ -192,7 +192,7 @@ public class JavaParser {
         return start;
     }
 
-    private static boolean areParanthesisBalanced(String sourceCodeToCheck) {
+    private static boolean areParenthesisBalanced(String sourceCodeToCheck) {
         Stack<Character> stack = new Stack<>();
 
         for (int i = 0; i < sourceCodeToCheck.length(); i++) {
