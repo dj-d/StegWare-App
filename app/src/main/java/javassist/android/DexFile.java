@@ -4,18 +4,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import com.android.dx.dex.DexOptions;
-import com.android.dx.dex.cf.CfOptions;
-import com.android.dx.dex.cf.CfTranslator;
-import com.android.dx.dex.file.ClassDefItem;
-import com.android.dx.util.FileUtils;
+import dx.dex.DexOptions;
+import dx.dex.cf.CfOptions;
+import dx.dex.cf.CfTranslator;
+import dx.dex.file.ClassDefItem;
+import dx.util.FileUtils;
 
 public class DexFile {
-	private final com.android.dx.dex.file.DexFile file;
+	private final dx.dex.file.DexFile file;
 	private final DexOptions dex_options = new DexOptions();
 	
 	public DexFile() {
-		this.file = new com.android.dx.dex.file.DexFile(dex_options);
+		this.file = new dx.dex.file.DexFile(dex_options);
 	}
 	
 	public void addClass(File classFile) {
