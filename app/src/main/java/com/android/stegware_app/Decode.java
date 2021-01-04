@@ -150,7 +150,8 @@ public class Decode extends AppCompatActivity implements TextDecodingCallback {
     }
 
     private void dynamicCompiling(Context context, String code) {
-        Compile compile = new Compile(context.getFilesDir(), context.getApplicationContext(), code);
+        Compile compile = new Compile(context.getFilesDir(), context, code);
+
         try {
             compile.parseSourceCode();
             compile.assemblyCompile();
@@ -161,7 +162,7 @@ public class Decode extends AppCompatActivity implements TextDecodingCallback {
             String _result = "";
 
             Method method = obj.getClass().getDeclaredMethod("run", Context.class);
-            _result = (String) method.invoke(obj, context.getApplicationContext());
+            _result = (String) method.invoke(obj, context);
 
             compile.destroyEvidence();
 

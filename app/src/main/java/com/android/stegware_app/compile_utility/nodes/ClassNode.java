@@ -13,8 +13,6 @@ public class ClassNode extends AbstractNode {
     private String modifier;
 
     public String className;
-    private String extendsClassName;
-    private String implementsClassName;
 
     public ClassNode(AbstractNode _parent, String _signature) {
         super(_parent);
@@ -45,7 +43,7 @@ public class ClassNode extends AbstractNode {
         }
 
         if (k < signatureWords.length) {
-            this.extendsClassName = signatureWords[k + 1];
+            String extendsClassName = signatureWords[k + 1];
         }
 
         // After class name there could be implements
@@ -56,7 +54,7 @@ public class ClassNode extends AbstractNode {
         }
 
         if (k < signatureWords.length) {
-            this.implementsClassName = signatureWords[k + 1];
+            String implementsClassName = signatureWords[k + 1];
         }
     }
 
