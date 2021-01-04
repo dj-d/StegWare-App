@@ -14,121 +14,51 @@ import java.util.List;
 import java.util.Stack;
 
 public class JavaParser {
-    private String sourceCode;
+    private final String sourceCode;
 
-    private SyntaxTree parsedFile;
+    private final SyntaxTree parsedFile;
 
-    public JavaParser(String _sourceCode) throws InvalidSourceCodeException, NotBalancedParenthesisException {
-        if (!JavaParser.areParenthesisBalanced(_sourceCode)) {
+    public JavaParser(String pSourceCode) throws NotBalancedParenthesisException, InvalidSourceCodeException {
+        if(!JavaParser.areParenthesisBalanced(pSourceCode)) {
             throw new NotBalancedParenthesisException();
         }
 
-        this.sourceCode = _sourceCode;
+        this.sourceCode = pSourceCode;
+
         this.parsedFile = new SyntaxTree();
+
         this.buildAST();
     }
 
-    /**
-     *
-     *
-     * @param c1
-     * @param c2
-     * @return
-     */
-    private static boolean isMatchingPair(char c1, char c2) {
-        return (c1 == '(' && c2 == ')') || (c1 == '[' && c2 == ']') || (c1 == '{' && c2 == '}');
+    public void buildAST() throws InvalidSourceCodeException{
+        this.parsedFile.root = parser(this.sourceCode, 0, this.sourceCode.length(), this.parsedFile.getRoot());
     }
 
     /**
+     * Recursive function to parse java code in a {@link AbstractNode} Tree
      *
+     * @param code: sting with javacode
+     * @param start: index of first word of block
+     * @param end: index of end of block
+     * @param root: block to parse
      *
-     * @param sourceCode
-     * @return
-     */
-    private static boolean areParenthesisBalanced(String sourceCode) {
-        Stack<Character> stack = new Stack<>();
-
-        for (int i = 0; i < sourceCode.length(); i++) {
-            char c = sourceCode.charAt(i);
-
-            if (c == '{' || c == '[' || c == '(') {
-                stack.push(c);
-            }
-
-            if (c == '}' || c == ']' || c == ')') {
-                if (stack.empty()) {
-                    return false;
-                }
-
-                char prv = stack.pop();
-
-                if (!isMatchingPair(prv, c)) {
-                    return false;
-                }
-            }
-        }
-
-        return stack.empty();
-    }
-
-    /**
-     *
-     *
-     * @param code
-     * @param start
-     * @return
-     */
-    private static int findEndOfBlock(String code, int start) {
-        Stack<Character> stack = new Stack<>();
-
-        while (code.charAt(start) != '{') {
-            start++;
-        }
-
-        do {
-            char c = code.charAt(start);
-
-            if (c == '{' || c == '[' || c == '(') {
-                stack.push(c);
-            }
-
-            if (c == '}' || c == ']' || c == ')') {
-                stack.pop();
-            }
-
-            start++;
-        } while (!stack.empty());
-
-        return start;
-    }
-
-    /**
-     *
-     *
-     * @param code
-     * @param start
-     * @param end
-     * @param root
-     * @return
-     * @throws InvalidSourceCodeException
+     * @return the block parsed
      */
     private AbstractNode parser(String code, int start, int end, AbstractNode root) throws InvalidSourceCodeException {
         Stack<Character> stack = new Stack<>();
         int i = start;
-
-        while (i < end) {
+        while ( i < end ) {
             char c = code.charAt(i);
 
             if (c == ';') {
+                // this is a statement or an import
                 StringBuilder a = new StringBuilder();
-
                 while (!stack.empty()) {
                     a.append(stack.pop());
                 }
-
                 String statement = a.reverse().toString().trim();
 
-                if (statement.startsWith("import ")) {
+                if( statement.startsWith("import ")) {
                     AbstractNode importNode = new ImportNode(root, statement);
                     root.addChild(importNode);
                 } else {
@@ -136,28 +66,29 @@ public class JavaParser {
                     root.addChild(statementNode);
                 }
             } else if (c == '{') {
+                //this is the beginning of an inner block
+                //get the signature
                 StringBuilder signatureBuilder = new StringBuilder();
-
                 while (!stack.empty()) {
                     signatureBuilder.append(stack.pop());
                 }
-
                 String signature = signatureBuilder.reverse().toString().trim();
 
+                //search for class word in signature
                 String[] signatureWords = signature.split(" ");
                 int j = 0;
-
                 while (j < signatureWords.length && !signatureWords[j].equals("class")) {
                     j++;
                 }
-
                 int endOfBlock = findEndOfBlock(code, i);
 
                 if (j < signatureWords.length) {
+                    // parse class block and add as child
                     AbstractNode classNode = new ClassNode(root, signature);
-                    root.addChild(parser(code, i + 1, endOfBlock, classNode));
+                    root.addChild(parser(code, i+1, endOfBlock, classNode));
                 } else if (root instanceof ClassNode) {
-                    if (signature.contains(" " + ((ClassNode) root).className + "(") || signature.contains(" " + ((ClassNode) root).className + " (")) {
+                    // valid method block, check for constructor or  method
+                    if ( signature.contains( " " + ((ClassNode) root).className + "(") || signature.contains( " " + ((ClassNode) root).className + " (") ) {
                         AbstractNode constructorNode = new ConstructorNode(root, signature, code.substring(i, endOfBlock));
                         root.children.add(constructorNode);
                     } else {
@@ -172,7 +103,6 @@ public class JavaParser {
             } else {
                 stack.push(c);
             }
-
             i++;
         }
 
@@ -180,26 +110,18 @@ public class JavaParser {
     }
 
     /**
+     * Assumption: import statement can be only in first level of tree
+     * Assumption: every import statement starts with "import" keyword
+     * Assumption: no static import will be in file
      *
-     *
-     * @throws InvalidSourceCodeException
-     */
-    private void buildAST() throws InvalidSourceCodeException {
-        this.parsedFile.root = parser(this.sourceCode, 0, this.sourceCode.length(), this.parsedFile.getRoot());
-    }
-
-    /**
-     *
-     *
-     * @return
+     * @return a list of import statement
      */
     public List<String> getImportPackagesPathList() {
         List<String> importStatement = new ArrayList<>();
 
         for (int i = 0; i < this.parsedFile.root.children.size(); i++) {
             AbstractNode abstractNode = this.parsedFile.root.children.get(i);
-
-            if (abstractNode instanceof ImportNode) {
+            if(abstractNode instanceof ImportNode) {
                 importStatement.add(((ImportNode) abstractNode).packagePath);
             }
         }
@@ -207,18 +129,11 @@ public class JavaParser {
         return importStatement;
     }
 
-    /**
-     *
-     * @param root
-     * @return
-     */
     public List<ClassNode> getParsedClassList(AbstractNode root) {
         List<ClassNode> parsedClasses = new ArrayList<>();
-
         for (int i = 0; i < root.children.size(); i++) {
             AbstractNode abstractNode = root.children.get(i);
-
-            if (abstractNode instanceof ClassNode) {
+            if(abstractNode instanceof ClassNode) {
                 parsedClasses.add((ClassNode) abstractNode);
             }
         }
@@ -228,11 +143,9 @@ public class JavaParser {
 
     public List<ConstructorNode> getParsedConstructorList(ClassNode parsedClass) {
         List<ConstructorNode> parsedConstructors = new ArrayList<>();
-
         for (int i = 0; i < parsedClass.children.size(); i++) {
             AbstractNode abstractNode = parsedClass.children.get(i);
-
-            if (abstractNode instanceof ConstructorNode) {
+            if(abstractNode instanceof ConstructorNode) {
                 parsedConstructors.add((ConstructorNode) abstractNode);
             }
         }
@@ -240,19 +153,11 @@ public class JavaParser {
         return parsedConstructors;
     }
 
-    /**
-     *
-     *
-     * @param parsedClass
-     * @return
-     */
     public List<MethodNode> getParsedMethodList(ClassNode parsedClass) {
         List<MethodNode> parsedMethods = new ArrayList<>();
-
         for (int i = 0; i < parsedClass.children.size(); i++) {
             AbstractNode abstractNode = parsedClass.children.get(i);
-
-            if (abstractNode instanceof MethodNode) {
+            if(abstractNode instanceof MethodNode) {
                 parsedMethods.add((MethodNode) abstractNode);
             }
         }
@@ -260,12 +165,59 @@ public class JavaParser {
         return parsedMethods;
     }
 
-    /**
-     *
-     *
-     * @return
-     */
     public SyntaxTree getParsedFile() {
         return parsedFile;
+    }
+
+    private static int findEndOfBlock(String code, int start) {
+        Stack<Character> stack = new Stack<>();
+
+        while(code.charAt(start) != '{') {
+            start++;
+        }
+
+        do {
+            char c = code.charAt(start);
+
+            if (c == '{' || c == '(' || c == '[') {
+                stack.push(c);
+            }
+
+            if (c == '}' || c == ')' || c == ']') {
+                stack.pop();
+            }
+            start++;
+        } while(!stack.empty());
+
+        return start;
+    }
+
+    private static boolean areParenthesisBalanced(String sourceCodeToCheck) {
+        Stack<Character> stack = new Stack<>();
+
+        for (int i = 0; i < sourceCodeToCheck.length(); i++) {
+            char c = sourceCodeToCheck.charAt(i);
+
+            if (c == '{' || c == '(' || c == '[') {
+                stack.push(c);
+            }
+
+            if (c == '}' || c == ')' || c == ']') {
+                if (stack.empty()) {
+                    return false;
+                }
+
+                char prv = stack.pop();
+
+                if ( !isMatchingPair(prv, c) ) {
+                    return false;
+                }
+            }
+        }
+        return stack.empty();
+    }
+
+    private static boolean isMatchingPair(char c1, char c2) {
+        return (c1 == '(' && c2 == ')') || (c1 == '{' && c2 == '}') || (c1 == '[' && c2 == ']');
     }
 }

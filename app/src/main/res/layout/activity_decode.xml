@@ -82,6 +82,16 @@
         android:textAlignment="center"
         android:textSize="14dp" />
 
+    <Button
+        android:id="@+id/dynamic_compile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="0dp"
+        android:text="Compile"
+        android:textAlignment="textStart"
+        android:textSize="14dp" />
+
     <TextView
         android:id="@+id/whether_decoded"
         android:layout_width="70dp"

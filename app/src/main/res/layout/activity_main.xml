@@ -13,4 +13,12 @@
         android:layout_marginTop="125dp"
         android:text="Encode" />
 
+    <Button
+        android:id="@+id/decode_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/encode_button"
+        android:layout_below="@+id/encode_button"
+        android:layout_marginTop="65dp"
+        android:text="Decode" />
 </RelativeLayout>
