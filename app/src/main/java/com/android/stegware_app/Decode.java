@@ -3,7 +3,6 @@ package com.android.stegware_app;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -22,7 +21,6 @@ import com.ayush.imagesteganographylibrary.Text.AsyncTaskCallback.TextDecodingCa
 import com.ayush.imagesteganographylibrary.Text.ImageSteganography;
 import com.ayush.imagesteganographylibrary.Text.TextDecoding;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -114,7 +112,6 @@ public class Decode extends AppCompatActivity implements TextDecodingCallback {
                 Log.d(TAG, "Error : " + e);
             }
         }
-
     }
 
     @Override
