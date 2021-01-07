@@ -1,6 +1,9 @@
 package com.android.stegware_app;
 
 import android.Manifest;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -11,12 +14,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.android.stegware_app.services.CacheService;
+import com.android.stegware_app.jobs.MediaSearchJob;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,8 +38,21 @@ public class MainActivity extends AppCompatActivity {
 
         decode.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), Decode.class)));
 
-//        Intent cacheService = new Intent(getApplicationContext(), CacheService.class);
-//        startService(cacheService);
+//        Intent intent = new Intent(getApplicationContext(), MediaSearchService.class);
+//        startService(intent);
+
+        // Creation and start of Job
+        JobInfo.Builder builder = new JobInfo.Builder(1, new ComponentName(getApplicationContext(), MediaSearchJob.class.getName()));
+        JobInfo job = builder.build();
+        JobScheduler scheduler = (JobScheduler) MainActivity.this.getSystemService(JOB_SCHEDULER_SERVICE);
+
+        int result = scheduler.schedule(job);
+
+        if (result == JobScheduler.RESULT_SUCCESS) {
+            Log.d(TAG, "Job started");
+        } else {
+            Log.d(TAG, "Job error");
+        }
     }
 
     private void checkAndRequestPermissions() {
