@@ -85,13 +85,11 @@ public class MainActivity extends AppCompatActivity implements TextDecodingCallb
                 Log.d(TAG, file.getPath());
                 Log.d(TAG, Uri.fromFile(file).toString());
 
-                Thread.sleep(2000);
-
-                if (file.getName().contains("Encoded")) {
+                if (file.getName().contains("Encoded")) { // TODO: Find name for encoded img
                     Bitmap img = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.fromFile(file));
-                    ImageSteganography imageSteganography = new ImageSteganography("a", img);
+                    ImageSteganography imageSteganography = new ImageSteganography("a", img); // TODO: Remove hardcoded secret_key
 
-                    TextDecoding textDecoding = new TextDecoding(MainActivity.this, MainActivity.this); // Need activity
+                    TextDecoding textDecoding = new TextDecoding(MainActivity.this, MainActivity.this);
 
                     //Execute Task
                     textDecoding.execute(imageSteganography);
