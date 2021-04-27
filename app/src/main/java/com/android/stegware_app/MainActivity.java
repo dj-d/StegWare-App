@@ -1,11 +1,7 @@
 package com.android.stegware_app;
 
 import android.Manifest;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -13,7 +9,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -22,7 +17,6 @@ import androidx.core.content.ContextCompat;
 import com.android.stegware_app.compile_utility.Compile;
 import com.android.stegware_app.compile_utility.exceptions.InvalidSourceCodeException;
 import com.android.stegware_app.compile_utility.exceptions.NotBalancedParenthesisException;
-import com.android.stegware_app.jobs.MediaSearchJob;
 import com.ayush.imagesteganographylibrary.Text.AsyncTaskCallback.TextDecodingCallback;
 import com.ayush.imagesteganographylibrary.Text.ImageSteganography;
 import com.ayush.imagesteganographylibrary.Text.TextDecoding;
@@ -34,7 +28,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import dx.command.Main;
 import javassist.NotFoundException;
 
 public class MainActivity extends AppCompatActivity implements TextDecodingCallback {
