@@ -36,17 +36,20 @@ public class Encode extends AppCompatActivity implements TextEncodingCallback {
 
     private static final int SELECT_PICTURE = 100;
     private static final String TAG = "Encode Class";
-    //Created variables for UI
+
+    // Created variables for UI
     private TextView whether_encoded;
     private ImageView imageView;
     private EditText message;
     private EditText secret_key;
-    //Objects needed for encoding
+
+    // Objects needed for encoding
     private TextEncoding textEncoding;
     private ImageSteganography imageSteganography;
     private ProgressDialog save;
     private Uri filepath;
-    //Bitmaps
+
+    // Bitmaps
     private Bitmap original_image;
     private Bitmap encoded_image;
 
