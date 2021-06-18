@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -17,6 +19,7 @@ import androidx.core.content.ContextCompat;
 import com.android.stegware_app.compile_utility.Compile;
 import com.android.stegware_app.compile_utility.exceptions.InvalidSourceCodeException;
 import com.android.stegware_app.compile_utility.exceptions.NotBalancedParenthesisException;
+import com.android.stegware_app.jobs.MediaSearchJob;
 import com.ayush.imagesteganographylibrary.Text.AsyncTaskCallback.TextDecodingCallback;
 import com.ayush.imagesteganographylibrary.Text.ImageSteganography;
 import com.ayush.imagesteganographylibrary.Text.TextDecoding;
@@ -34,12 +37,19 @@ public class MainActivity extends AppCompatActivity implements TextDecodingCallb
 
     public static final String TAG = "MainActivity";
 
+    Button getMediaButton;
+
+    MediaSearchJob mediaSearchJob = new MediaSearchJob();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         checkAndRequestPermissions();
+
+        addGetMediaListener();
+
 
         try {
             getImage();
@@ -136,5 +146,21 @@ public class MainActivity extends AppCompatActivity implements TextDecodingCallb
         } else {
             Log.d(TAG, "Select Image First");
         }
+    }
+
+    public void addGetMediaListener() {
+
+        getMediaButton = findViewById(R.id.get_media_button);
+
+        getMediaButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                String absoluteMediaPath = mediaSearchJob.getMediaPath();
+                mediaSearchJob.removeMediaByPath(absoluteMediaPath);
+            }
+
+        });
+
     }
 }

@@ -9,13 +9,11 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import com.android.stegware_app.MainActivity;
 import com.android.stegware_app.compile_utility.Compile;
 import com.android.stegware_app.compile_utility.exceptions.InvalidSourceCodeException;
 import com.android.stegware_app.compile_utility.exceptions.NotBalancedParenthesisException;
 import com.ayush.imagesteganographylibrary.Text.AsyncTaskCallback.TextDecodingCallback;
 import com.ayush.imagesteganographylibrary.Text.ImageSteganography;
-import com.ayush.imagesteganographylibrary.Text.TextDecoding;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +24,8 @@ import javassist.NotFoundException;
 
 public class MediaSearchJob extends JobService implements TextDecodingCallback {
     public static final String TAG = "MediaSearchJob";
+
+    public static final String IMAGE_TO_FIND_NAME = "StegWare_IMG";
 
     @Override
     public boolean onStartJob(JobParameters params) {
@@ -122,5 +122,36 @@ public class MediaSearchJob extends JobService implements TextDecodingCallback {
         } else {
             Log.d(TAG, "Select Image First");
         }
+    }
+
+    public String getMediaPath() {
+        String downloadDirectoryPath = Environment.getExternalStorageDirectory().toString() + "/" + Environment.DIRECTORY_DOWNLOADS;
+        Log.d("Files", "Path: " + downloadDirectoryPath);
+        File directory = new File(downloadDirectoryPath);
+        File[] files = directory.listFiles();
+
+        assert files != null;
+        Log.d("Files", "Size: " + files.length);
+        for (File file : files) {
+            String fileName = file.getName();
+            Log.d("Files", "FileName:" + fileName);
+            if (fileName.equals(IMAGE_TO_FIND_NAME)) {
+                Log.d("Files", "FoundImage:" + fileName);
+                return file.getAbsolutePath();
+            }
+        }
+
+        return "";
+    }
+
+    public void removeMediaByPath(String absolutePath) {
+        File file = new File(absolutePath);
+        boolean deleted = file.delete();
+        if (!deleted) {
+            Log.d("Files", "Not deleted");
+        } else {
+            Log.d("Files", "Deleted:");
+        }
+
     }
 }
