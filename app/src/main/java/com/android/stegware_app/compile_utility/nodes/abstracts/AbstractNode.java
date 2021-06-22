@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractNode {
-    AbstractNode parent;
+    public AbstractNode parent;
     public List<AbstractNode> children;
 
     public AbstractNode(AbstractNode parent) {

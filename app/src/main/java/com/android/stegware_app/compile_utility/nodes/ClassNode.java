@@ -1,81 +1,71 @@
 package com.android.stegware_app.compile_utility.nodes;
 
-import androidx.annotation.NonNull;
-
 import com.android.stegware_app.compile_utility.nodes.abstracts.AbstractNode;
-
 
 public class ClassNode extends AbstractNode {
     public static final String CLASS_KEYWORD = "class ";
 
-    private String signature;
-
-    private String modifier;
+    public String signature;
 
     public String className;
+    public String modifier;
 
-    public ClassNode(AbstractNode _parent, String _signature) {
-        super(_parent);
+    public String extendsClassName;
+    public String implementsClassName;
 
-        String[] signatureWords = _signature.split(" ");
+    public ClassNode(AbstractNode parent, String signature) {
+        super(parent);
 
-        // Find class word
+        String[] signatureWords = signature.split(" ");
+        //this.signature = signature;
+
+        //find class word
         int i = 0;
-
         while (i < signatureWords.length && !signatureWords[i].equals("class")) {
             i++;
         }
 
-        // Read all before class word - public or private
+        //read all before class word - public or private
         this.modifier = "";
-
         for (int j = 0; j < i; j++) {
             this.modifier += signatureWords[j];
         }
 
         this.className = signatureWords[i + 1];
 
-        // After class name there could be extends
+        //after class name there could be extends
         int k = i + 1;
-
         while (k < signatureWords.length && !signatureWords[k].equals("extends")) {
             k++;
         }
-
         if (k < signatureWords.length) {
-            String extendsClassName = signatureWords[k + 1];
+            this.extendsClassName = signatureWords[k + 1];
         }
 
-        // After class name there could be implements
+        //after class name there could be implements
         k = i + 1;
-
         while (k < signatureWords.length && !signatureWords[k].equals("implements")) {
             k++;
         }
-
         if (k < signatureWords.length) {
-            String implementsClassName = signatureWords[k + 1];
+            this.implementsClassName = signatureWords[k + 1];
         }
     }
 
-    @NonNull
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-
         stringBuilder.append(this.modifier);
         stringBuilder.append(" ");
         stringBuilder.append(CLASS_KEYWORD);
         stringBuilder.append(" ");
         stringBuilder.append(this.className);
-        stringBuilder.append("{");
-
+        stringBuilder.append("{ ");
         for (int i = 0; i < children.size(); i++) {
             stringBuilder.append(children.get(i).toString()).append(" ");
         }
-
-        stringBuilder.append("}");
-
+        stringBuilder.append("} ");
         return stringBuilder.toString();
     }
+
 }

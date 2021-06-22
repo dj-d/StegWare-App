@@ -1,7 +1,5 @@
 package com.android.stegware_app.compile_utility;
 
-import androidx.annotation.NonNull;
-
 import com.android.stegware_app.compile_utility.nodes.RootNode;
 import com.android.stegware_app.compile_utility.nodes.abstracts.AbstractNode;
 
@@ -16,7 +14,7 @@ public class SyntaxTree {
         return root;
     }
 
-    @NonNull
+
     @Override
     public String toString() {
         return root.toString();

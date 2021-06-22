@@ -1,19 +1,15 @@
 package com.android.stegware_app.compile_utility.nodes;
 
-import androidx.annotation.NonNull;
-
 import com.android.stegware_app.compile_utility.nodes.abstracts.AbstractNode;
 
 public class StatementNode extends AbstractNode {
-    private String code;
+    public String code;
 
-    public StatementNode(AbstractNode _parent, String _code) {
-        super(_parent);
-
-        this.code = _code;
+    public StatementNode(AbstractNode parent, String code) {
+        super(parent);
+        this.code = code;
     }
 
-    @NonNull
     @Override
     public String toString() {
         return this.code + " ";

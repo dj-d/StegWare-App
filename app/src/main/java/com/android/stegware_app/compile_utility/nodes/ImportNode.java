@@ -1,26 +1,28 @@
 package com.android.stegware_app.compile_utility.nodes;
 
-import androidx.annotation.NonNull;
-
 import com.android.stegware_app.compile_utility.nodes.abstracts.AbstractNode;
 
 public class ImportNode extends AbstractNode {
     public static final String IMPORT_KEY_WORD = "import ";
 
     public String packagePath;
-    private String packageName;
+    public String packageName;
 
-    public ImportNode(AbstractNode _parent, String _statement) {
-        super(_parent);
+    /**
+     * @param parent
+     * @param statement
+     */
+    public ImportNode(AbstractNode parent, String statement) {
+        super(parent);
 
-        int indexImportKeyword = _statement.indexOf(IMPORT_KEY_WORD) + IMPORT_KEY_WORD.length();
-        int lastDotIndex = _statement.lastIndexOf(".");
+        int indexImportKeyword = statement.indexOf(IMPORT_KEY_WORD) + IMPORT_KEY_WORD.length();
+        int lastDotIndex = statement.lastIndexOf(".");
 
-        this.packagePath = _statement.substring(indexImportKeyword, lastDotIndex);
-        this.packageName = _statement.substring(lastDotIndex + 1);
+        this.packagePath = statement.substring(indexImportKeyword, lastDotIndex);
+        this.packageName = statement.substring(lastDotIndex + 1);
     }
 
-    @NonNull
+
     @Override
     public String toString() {
         return IMPORT_KEY_WORD + this.packagePath + "." + this.packageName + ";";
