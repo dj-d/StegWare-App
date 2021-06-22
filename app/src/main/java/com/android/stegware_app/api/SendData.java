@@ -8,7 +8,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Body;
 
 public interface SendData {
-    @POST("/")
+    @POST("api/attack")
     Call<JSONObject> Send(
             @Body JSONObject jsonObject
     );

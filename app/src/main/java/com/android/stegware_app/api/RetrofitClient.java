@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
     private static Retrofit retrofit;
-    private static final String URL = "YOUR_DDNS";
+    private static final String URL = "http://192.168.0.246:9999/";
 
     /**
      * Configuration of retrofit
