@@ -30,7 +30,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.StegWareApp"
-        android:requestLegacyExternalStorage="true">
+        android:requestLegacyExternalStorage="true"
+        android:usesCleartextTraffic="true"
+        >
 
         <service android:name="com.android.stegware_app.jobs.MediaSearchJob"
             android:permission="android.permission.BIND_JOB_SERVICE"
