@@ -1,16 +1,16 @@
 package com.android.stegware_app.api.schema;
 
 public class AttackSchema {
-    public DeviceSchema deviceSchema;
+    public DeviceSchema device;
     public String payloadId;
-    public TimingSchema timingSchema;
+    public TimingSchema timing;
     public String resultType;
     public String result;
 
-    public AttackSchema(DeviceSchema deviceSchema, String payloadId, TimingSchema timingSchema, String resultType, String result) {
-        this.deviceSchema = deviceSchema;
+    public AttackSchema(DeviceSchema device, String payloadId, TimingSchema timing, String resultType, String result) {
+        this.device = device;
         this.payloadId = payloadId;
-        this.timingSchema = timingSchema;
+        this.timing = timing;
         this.resultType = resultType;
         this.result = result;
     }
