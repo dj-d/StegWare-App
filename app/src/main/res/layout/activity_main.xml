@@ -33,17 +33,17 @@
                 android:layout_height="wrap_content"
                 android:text="Get media" />
 
-            <Button
-                android:id="@+id/encode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Encode" />
+<!--            <Button-->
+<!--                android:id="@+id/encode"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Encode" />-->
 
-            <Button
-                android:id="@+id/decode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Decode" />
+<!--            <Button-->
+<!--                android:id="@+id/decode"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Decode" />-->
         </LinearLayout>
 
     </FrameLayout>

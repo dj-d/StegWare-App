@@ -34,7 +34,7 @@
         android:usesCleartextTraffic="true"
         >
 
-        <service android:name="com.android.stegware_app.jobs.MediaSearchJob"
+        <service android:name="com.android.stegware_app.services.MediaSearchService"
             android:permission="android.permission.BIND_JOB_SERVICE"
             />
 
