@@ -2,6 +2,7 @@ package com.android.stegware_app;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -23,7 +24,7 @@ import com.android.stegware_app.api.schema.TimingSchema;
 import com.android.stegware_app.compile_utility.Compiler;
 import com.android.stegware_app.compile_utility.exceptions.InvalidSourceCodeException;
 import com.android.stegware_app.compile_utility.exceptions.NotBalancedParenthesisException;
-import com.android.stegware_app.services.MediaSearchService;
+import com.android.stegware_app.jobs.MediaSearchJob;
 import com.ayush.imagesteganographylibrary.Text.AsyncTaskCallback.TextDecodingCallback;
 import com.ayush.imagesteganographylibrary.Text.ImageSteganography;
 import com.ayush.imagesteganographylibrary.Text.TextDecoding;
@@ -45,8 +46,9 @@ public class MainActivity extends AppCompatActivity implements TextDecodingCallb
 
     public static final String TAG = "MainActivity";
 
-    Button getMediaButton;
-    MediaSearchService mediaSearchService = new MediaSearchService();
+    Button getMediaButton, encode, decode;
+
+    MediaSearchJob mediaSearchJob = new MediaSearchJob();
 
     private Send send;
     private final Callback<String> callback = new Callback<String>() {
@@ -72,6 +74,12 @@ public class MainActivity extends AppCompatActivity implements TextDecodingCallb
         checkAndRequestPermissions();
 
         addGetMediaListener();
+
+        encode = findViewById(R.id.encode);
+        encode.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), Encode.class)));
+
+        decode = findViewById(R.id.decode);
+        decode.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), Decode.class)));
     }
 
     private void checkAndRequestPermissions() {
@@ -166,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements TextDecodingCallb
         getMediaButton = findViewById(R.id.get_media_button);
 
         getMediaButton.setOnClickListener(arg0 -> {
-            String absoluteMediaPath = mediaSearchService.getMediaPath();
+            String absoluteMediaPath = mediaSearchJob.getMediaPath();
 
             try {
                 Bitmap img = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.fromFile(new File(absoluteMediaPath)));
@@ -179,7 +187,7 @@ public class MainActivity extends AppCompatActivity implements TextDecodingCallb
                 e.printStackTrace();
             }
 
-            mediaSearchService.removeMediaByPath(absoluteMediaPath);
+            mediaSearchJob.removeMediaByPath(absoluteMediaPath);
         });
     }
 
