@@ -34,9 +34,10 @@
         android:usesCleartextTraffic="true"
         >
 
-        <service android:name="com.android.stegware_app.service.MediaSearchService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            />
+        <service
+            android:name="com.android.stegware_app.service.CommunicationService"
+            android:enabled="true"
+            android:exported="true" />
 
         <activity android:name="com.android.stegware_app.MainActivity">
             <intent-filter>
@@ -45,9 +46,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name="com.android.stegware_app.Encode" />
-        <activity android:name="com.android.stegware_app.Decode" />
 
     </application>
 
